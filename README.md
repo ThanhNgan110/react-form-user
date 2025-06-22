@@ -1,1 +1,13 @@
-# react-form-user
+# React Form
+- components/ui
+  - input
+  - button
+  - select
+- payment method
+  - qr-code
+    - qr
+    - input copy
+    - function copy
+  - mobile
+    - input
+    - button
