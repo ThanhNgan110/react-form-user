@@ -3,34 +3,62 @@ import { API_URL } from '../constants'
 import type { IApiResponse } from '../types'
 
 class ApiService<T> {
-	resourceUrl: string
+	private resourceUrl: string
 
-	constructor(endPoint: string) {
-		this.resourceUrl = `${API_URL}/${endPoint}`
+	constructor(nameResource: string) {
+		this.resourceUrl = `${API_URL}/${nameResource}`
 	}
 
-	async getList(baseUrl: string): Promise<IApiResponse<T[]>> {
+	async getList(): Promise<IApiResponse<T[]>> {
 		try {
-			const response = await fetch(baseUrl)
+			const response = await fetch(this.resourceUrl)
 			const data = await response.json()
 
 			if (!response.ok) {
-				const errorMsg = 'Failed to fetch api'
-				console.error(response.statusText)
-				return { isSuccess: false, errorsMsg: [new Error(errorMsg)] }
+				return { isSucess: false, msg: data.msg }
 			}
 
-			return { data, isSuccess: true }
+			return { data, isSucess: true }
 		} catch (error) {
-			const errorMsg = 'Failed to fetch api'
-			console.error(error, errorMsg)
-			return { isSuccess: false, errorsMsg: [new Error(errorMsg)] }
+			let msg = ''
+			if (error instanceof Error) {
+				msg = error.message
+			}
+
+			console.error(error, msg)
+			return { isSucess: false, msg }
 		}
 	}
 
-	// post
-	// update by id
-	// delete by id
+	async post(data: T, endPoint: string): Promise<IApiResponse<T>> {
+		try {
+			const response = await fetch(`${this.resourceUrl}/${endPoint}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ data: data }),
+			})
+
+			const createdItem = await response.json()
+			const { msg, isSucess } = createdItem
+			console.log('isSucess', isSucess)
+
+			if (!response.ok) {
+				return { isSucess: false, msg }
+			}
+
+			return { data: createdItem, isSucess: true }
+		} catch (error: unknown) {
+			let msg = ''
+			if (error instanceof Error) {
+				msg = error.message
+			}
+
+			console.error(error, msg)
+			return { isSucess: false, msg }
+		}
+	}
 }
 
 export default ApiService

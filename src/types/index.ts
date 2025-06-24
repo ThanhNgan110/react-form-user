@@ -1,8 +1,8 @@
 export interface IApiResponse<T> {
 	data?: T
 	status?: number
-	isSuccess: boolean
-	errorsMsg?: Error[]
+	isSucess: boolean
+	msg?: string
 }
 
 export interface IAccount {

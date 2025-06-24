@@ -1,5 +1,12 @@
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form'
 
+import { UserApiService } from '../../../services/user-service'
+
+import SelectField from '../../../components/ui/field/select-field'
+import TextField from '../../../components/ui/field/text-field'
+
+import { toast } from 'react-toastify'
+
 interface IFormInput {
 	first_name: string
 	last_name: string
@@ -11,10 +18,6 @@ interface IFormInput {
 	role: string
 	password: string
 }
-
-import SelectField from '../../../components/ui/field/select-field'
-import TextField from '../../../components/ui/field/text-field'
-import { toast } from 'react-toastify'
 
 function FormUser() {
 	const {
@@ -35,19 +38,15 @@ function FormUser() {
 		},
 	})
 
-	const onSubmit: SubmitHandler<IFormInput> = data => {
+	const onSubmit: SubmitHandler<IFormInput> = async data => {
 		console.log(data)
+		const response = await UserApiService.post(data, 'signup')
 
-		toast.success('🦄 Successfully!', {
-			position: 'top-right',
-			autoClose: 5000,
-			hideProgressBar: false,
-			closeOnClick: false,
-			pauseOnHover: true,
-			draggable: true,
-			progress: undefined,
-			theme: 'light',
-		})
+		if (response.isSucess === true) {
+			toast.success('🦄 Successfully!')
+		} else {
+			toast.error(`${response.msg}`)
+		}
 	}
 
 	return (
