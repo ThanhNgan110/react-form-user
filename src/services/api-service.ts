@@ -18,7 +18,7 @@ class ApiService<T> {
 				return { isSucess: false, msg: data.msg }
 			}
 
-			return { data, isSucess: true }
+			return { data: data.data, isSucess: true }
 		} catch (error) {
 			let msg = ''
 			if (error instanceof Error) {
