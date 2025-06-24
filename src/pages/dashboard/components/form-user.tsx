@@ -1,23 +1,13 @@
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form'
 
-import { UserApiService } from '../../../services/user-service'
-
 import SelectField from '../../../components/ui/field/select-field'
 import TextField from '../../../components/ui/field/text-field'
 
 import { toast } from 'react-toastify'
 
-interface IFormInput {
-	first_name: string
-	last_name: string
-	email: string
-	address: string
-	city: string
-	country: string
-	state: string
-	role: string
-	password: string
-}
+import type { IAccount } from '../../../types'
+
+import { UserApiService } from '../../../services/user-service'
 
 function FormUser() {
 	const {
@@ -26,6 +16,7 @@ function FormUser() {
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
+			_id: '',
 			first_name: '',
 			last_name: '',
 			email: '',
@@ -38,7 +29,7 @@ function FormUser() {
 		},
 	})
 
-	const onSubmit: SubmitHandler<IFormInput> = async data => {
+	const onSubmit: SubmitHandler<IAccount> = async data => {
 		console.log(data)
 		const response = await UserApiService.post(data, 'signup')
 

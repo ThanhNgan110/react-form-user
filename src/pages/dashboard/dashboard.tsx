@@ -17,7 +17,7 @@ function Dashboard() {
 	const fetchListUser = async () => {
 		const getListUser = await UserApiService.getList()
 		const listUser = getListUser.data
-    
+
 		if (listUser !== undefined) {
 			setUsers(listUser)
 		} else {
@@ -46,7 +46,7 @@ function Dashboard() {
 				<div className="relative overflow-x-auto">
 					<BasicTable headers={['First Name', 'Last Name', 'Email', 'Role', 'Action']}>
 						{users.map((item: IAccount) => (
-							<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+							<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={item._id}>
 								<th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 									{item.first_name}
 								</th>
