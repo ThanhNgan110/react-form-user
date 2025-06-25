@@ -2,21 +2,22 @@ import { useForm, Controller, type SubmitHandler } from 'react-hook-form'
 
 import SelectField from '../../../components/ui/field/select-field'
 import TextField from '../../../components/ui/field/text-field'
-
-import { toast } from 'react-toastify'
+import Button from '../../../components/ui/button/simple-buton'
 
 import type { IAccount } from '../../../types'
 
-import { UserApiService } from '../../../services/user-service'
+interface FormUserProps {
+	onAddUser: (user: Omit<IAccount, 'id'>) => void
+}
 
-function FormUser() {
+function FormUser({ onAddUser }: FormUserProps) {
 	const {
 		control,
 		handleSubmit,
+		reset,
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
-			_id: '',
 			first_name: '',
 			last_name: '',
 			email: '',
@@ -29,15 +30,9 @@ function FormUser() {
 		},
 	})
 
-	const onSubmit: SubmitHandler<IAccount> = async data => {
-		console.log(data)
-		const response = await UserApiService.post(data, 'signup')
-
-		if (response.isSucess === true) {
-			toast.success('🦄 Successfully!')
-		} else {
-			toast.error(`${response.msg}`)
-		}
+	const onSubmit: SubmitHandler<Omit<IAccount, 'id'>> = async user => {
+		onAddUser(user)
+		reset()
 	}
 
 	return (
@@ -50,8 +45,8 @@ function FormUser() {
 						rules={{
 							required: 'Please input value',
 							minLength: {
-								value: 6,
-								message: 'Please input value minium 6',
+								value: 3,
+								message: 'Please input value minium 3',
 							},
 						}}
 						render={({ field }) => <TextField label="First Name" id="firstName" {...field} />}
@@ -65,8 +60,8 @@ function FormUser() {
 						rules={{
 							required: 'Please input value',
 							minLength: {
-								value: 6,
-								message: 'Please input value minium 6',
+								value: 3,
+								message: 'Please input value minium 3',
 							},
 						}}
 						render={({ field }) => <TextField label="Last Name" id="lastName" {...field} />}
@@ -113,7 +108,7 @@ function FormUser() {
 								label="City"
 								options={[
 									{ label: 'Ho Chi Minh', value: 'HCM' },
-									{ label: 'Na Noi', value: 'HN' },
+									{ label: 'Ha Noi', value: 'HN' },
 									{ label: 'Da Lat', value: 'DL' },
 								]}
 								{...field}
@@ -188,7 +183,9 @@ function FormUser() {
 				</div>
 				<div className="md:col-span-5 text-right">
 					<div className="inline-flex items-end">
-						<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+						<Button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+							Submit
+						</Button>
 					</div>
 				</div>
 			</div>

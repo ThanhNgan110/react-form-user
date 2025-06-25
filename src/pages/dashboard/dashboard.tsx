@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 
 import BasicTable from '../../components/table/basic-table'
 import FormUser from './components/form-user'
+import Button from '../../components/ui/button/simple-buton'
 
 import type { IAccount } from '../../types'
 
 import { UserApiService } from '../../services/user-service'
+
+import { toast } from 'react-toastify'
 
 function Dashboard() {
 	const [users, setUsers] = useState<IAccount[]>([])
@@ -25,6 +28,18 @@ function Dashboard() {
 		}
 	}
 
+	const handleAddUser = async (user: Omit<IAccount, 'id'>) => {
+		// set loading
+		const res = await UserApiService.post(user, 'signup')
+
+		if (res.isSucess === true) {
+			await fetchListUser()
+			toast.success('Successfully')
+		} else {
+			toast.error('Error')
+		}
+	}
+
 	return (
 		<div className="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
 			<div className="container max-w-screen-lg mx-auto">
@@ -38,7 +53,7 @@ function Dashboard() {
 								<p>Please fill out all the fields.</p>
 							</div>
 							<div className="lg:col-span-2">
-								<FormUser />
+								<FormUser onAddUser={handleAddUser} />
 							</div>
 						</div>
 					</div>
@@ -46,7 +61,7 @@ function Dashboard() {
 				<div className="relative overflow-x-auto">
 					<BasicTable headers={['First Name', 'Last Name', 'Email', 'Role', 'Action']}>
 						{users.map((item: IAccount) => (
-							<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={item._id}>
+							<tr key={item._id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
 								<th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 									{item.first_name}
 								</th>
@@ -54,18 +69,12 @@ function Dashboard() {
 								<td className="px-6 py-4">{item.email}</td>
 								<td className="px-6 py-4">{item.role}</td>
 								<td className="px-6 py-4">
-									<button
-										type="button"
-										className="text-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer"
-									>
+									<Button type="button" className="text-blue-500">
 										Edit
-									</button>
-									<button
-										type="button"
-										className="text-red-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer"
-									>
+									</Button>
+									<Button type="button" className="text-red-500">
 										Delete
-									</button>
+									</Button>
 								</td>
 							</tr>
 						))}
