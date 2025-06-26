@@ -33,11 +33,32 @@ function Dashboard() {
 		const res = await UserApiService.post(user, 'signup')
 
 		if (res.isSucess === true) {
-			await fetchListUser()
+			setUsers(users => [user, ...users])
 			toast.success('Successfully')
 		} else {
-			toast.error('Error')
+			toast.error(`Error: ${res.msg}`)
 		}
+	}
+
+	const handleDeleteUser = async (id: string) => {
+		const res = await UserApiService.delete(id)
+
+		if (res?.isSucess == true) {
+			setUsers(users => users.filter(user => user._id !== id))
+			toast.success('Successfully')
+		} else {
+			toast.error(`Error: ${res?.msg}`)
+		}
+	}
+
+	const handleUpdateUser = (id: string) => {
+		console.log('id', id)
+
+		// const foundUserById = users.find(user => user._id === id)
+		// if (foundUserById) {
+		// 	const updatedUser = await UserApiService.put(id, user)
+		// 	setUsers(prev => prev.map(u => (u._id === id ? updatedUser : u)))
+		// }
 	}
 
 	return (
@@ -69,10 +90,10 @@ function Dashboard() {
 								<td className="px-6 py-4">{item.email}</td>
 								<td className="px-6 py-4">{item.role}</td>
 								<td className="px-6 py-4">
-									<Button type="button" className="text-blue-500">
+									<Button type="button" className="text-blue-500" onClick={() => handleUpdateUser(item._id)}>
 										Edit
 									</Button>
-									<Button type="button" className="text-red-500">
+									<Button type="button" className="text-red-500" onClick={() => handleDeleteUser(item._id)}>
 										Delete
 									</Button>
 								</td>

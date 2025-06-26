@@ -31,7 +31,7 @@ class ApiService<T> {
 		}
 	}
 
-	async post(data: Omit<T, 'id'>, endPoint: string): Promise<IApiResponse<T>> {
+	async post(data: Omit<T, '_id'>, endPoint: string): Promise<IApiResponse<T>> {
 		try {
 			const response = await fetch(`${this.resourceUrl}/${endPoint}`, {
 				method: 'POST',
@@ -60,9 +60,36 @@ class ApiService<T> {
 		}
 	}
 
-	async deleteById(id: string) {
+	async delete(id: string) {
+		console.log(id)
+
 		try {
-			const response = await fetch(`${this.resourceUrl}/${id}`)
+			const response = await fetch(`${this.resourceUrl}/${id}`, {
+				method: 'DELETE',
+			})
+			const result = await response.json()
+
+			if (!response.ok) {
+				return { isSucess: false, msg: result.msg }
+			}
+
+			return { isSucess: true, msg: result.msg }
+		} catch (error) {
+			console.error(error)
+		}
+	}
+
+	async put(id: string, data: Omit<T, 'id'>) {
+		console.log(data)
+
+		try {
+			const response = await fetch(`${this.resourceUrl}/${id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ data: data }),
+			})
 			const result = await response.json()
 
 			if (!response.ok) {
