@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form'
 
 import SelectField from '../../../components/ui/field/select-field'
@@ -8,15 +10,17 @@ import type { IAccount } from '../../../types'
 
 interface FormUserProps {
 	onAddUser: (user: Omit<IAccount, 'id'>) => void
+	selectedUser: IAccount | null
+	onUpdateUser: (user: Omit<IAccount, 'id'>) => void
 }
 
-function FormUser({ onAddUser }: FormUserProps) {
+function FormUser({ onAddUser, onUpdateUser, selectedUser }: FormUserProps) {
 	const {
 		control,
 		handleSubmit,
 		reset,
 		formState: { errors },
-	} = useForm({
+	} = useForm<Omit<IAccount, 'id'>>({
 		defaultValues: {
 			first_name: '',
 			last_name: '',
@@ -30,10 +34,31 @@ function FormUser({ onAddUser }: FormUserProps) {
 		},
 	})
 
-	const onSubmit: SubmitHandler<Omit<IAccount, 'id'>> = async user => {
-		onAddUser(user)
-		reset()
+	const onSubmit: SubmitHandler<Omit<IAccount, 'id'>> = user => {
+		if (selectedUser) {
+			onUpdateUser({ ...selectedUser, ...user })
+		} else {
+			onAddUser(user)
+		}
 	}
+
+	useEffect(() => {
+		if (selectedUser) {
+			reset(selectedUser)
+		} else {
+			reset({
+				first_name: '',
+				last_name: '',
+				email: '',
+				address: '',
+				city: '',
+				country: '',
+				state: '',
+				role: '',
+				password: '123456',
+			})
+		}
+	}, [reset, selectedUser])
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>

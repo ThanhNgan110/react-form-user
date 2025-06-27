@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 
 function Dashboard() {
 	const [users, setUsers] = useState<IAccount[]>([])
+	const [selectedUser, setSelectedUser] = useState<IAccount | null>()
 
 	useEffect(() => {
 		fetchListUser()
@@ -21,23 +22,23 @@ function Dashboard() {
 		const getListUser = await UserApiService.getList()
 		const listUser = getListUser.data
 
-		if (listUser !== undefined) {
-			setUsers(listUser)
-		} else {
+		if (!listUser) {
 			setUsers([])
+			return
 		}
+		setUsers(listUser)
 	}
 
 	const handleAddUser = async (user: Omit<IAccount, 'id'>) => {
-		// set loading
 		const res = await UserApiService.post(user, 'signup')
 
 		if (res.isSucess === true) {
-			setUsers(users => [user, ...users])
+			await fetchListUser()
+			setSelectedUser(null)
 			toast.success('Successfully')
-		} else {
-			toast.error(`Error: ${res.msg}`)
+			return
 		}
+		toast.error(`Error: ${res.msg}`)
 	}
 
 	const handleDeleteUser = async (id: string) => {
@@ -46,19 +47,31 @@ function Dashboard() {
 		if (res?.isSucess == true) {
 			setUsers(users => users.filter(user => user._id !== id))
 			toast.success('Successfully')
-		} else {
-			toast.error(`Error: ${res?.msg}`)
+			return
 		}
+		toast.error(`Error: ${res?.msg}`)
 	}
 
-	const handleUpdateUser = (id: string) => {
-		console.log('id', id)
+	const handleUpdateUser = async (updatedUser: IAccount) => {
+		const res = await UserApiService.put(updatedUser._id, updatedUser)
 
-		// const foundUserById = users.find(user => user._id === id)
-		// if (foundUserById) {
-		// 	const updatedUser = await UserApiService.put(id, user)
-		// 	setUsers(prev => prev.map(u => (u._id === id ? updatedUser : u)))
-		// }
+		if (res?.isSucess === true) {
+			setUsers(prev => prev.map(user => (user._id === updatedUser._id ? { ...user, ...updatedUser } : user)))
+			setSelectedUser(null)
+			toast.success('Successfully')
+			return
+		}
+		toast.error(`Error: ${res?.msg}`)
+	}
+
+	const handleShowUser = (id: string) => {
+		const foundUser = users.find(user => user._id === id)
+
+		if (foundUser) {
+			setSelectedUser(foundUser)
+			return
+		}
+		setSelectedUser(null)
 	}
 
 	return (
@@ -74,7 +87,11 @@ function Dashboard() {
 								<p>Please fill out all the fields.</p>
 							</div>
 							<div className="lg:col-span-2">
-								<FormUser onAddUser={handleAddUser} />
+								<FormUser
+									onAddUser={handleAddUser}
+									onUpdateUser={handleUpdateUser}
+									selectedUser={selectedUser ? selectedUser : null}
+								/>
 							</div>
 						</div>
 					</div>
@@ -90,7 +107,7 @@ function Dashboard() {
 								<td className="px-6 py-4">{item.email}</td>
 								<td className="px-6 py-4">{item.role}</td>
 								<td className="px-6 py-4">
-									<Button type="button" className="text-blue-500" onClick={() => handleUpdateUser(item._id)}>
+									<Button type="button" className="text-blue-500" onClick={() => handleShowUser(item._id)}>
 										Edit
 									</Button>
 									<Button type="button" className="text-red-500" onClick={() => handleDeleteUser(item._id)}>

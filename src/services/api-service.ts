@@ -61,8 +61,6 @@ class ApiService<T> {
 	}
 
 	async delete(id: string) {
-		console.log(id)
-
 		try {
 			const response = await fetch(`${this.resourceUrl}/${id}`, {
 				method: 'DELETE',
@@ -101,6 +99,8 @@ class ApiService<T> {
 			console.error(error)
 		}
 	}
+
+	
 }
 
 export default ApiService
