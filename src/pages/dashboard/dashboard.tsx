@@ -12,7 +12,7 @@ import { toast } from 'react-toastify'
 
 function Dashboard() {
 	const [users, setUsers] = useState<IAccount[]>([])
-	const [selectedUser, setSelectedUser] = useState<IAccount | null>()
+	const [selectedUser, setSelectedUser] = useState<IAccount | null>(null)
 
 	useEffect(() => {
 		fetchListUser()
@@ -20,19 +20,14 @@ function Dashboard() {
 
 	const fetchListUser = async () => {
 		const getListUser = await UserApiService.getList()
-		const listUser = getListUser.data
-
-		if (!listUser) {
-			setUsers([])
-			return
-		}
+		const listUser = getListUser?.data || [];
 		setUsers(listUser)
 	}
 
 	const handleAddUser = async (user: Omit<IAccount, 'id'>) => {
 		const res = await UserApiService.post(user, 'signup')
 
-		if (res.isSucess === true) {
+		if (res.isSucess) {
 			await fetchListUser()
 			setSelectedUser(null)
 			toast.success('Successfully')
@@ -44,7 +39,7 @@ function Dashboard() {
 	const handleDeleteUser = async (id: string) => {
 		const res = await UserApiService.delete(id)
 
-		if (res?.isSucess == true) {
+		if (res?.isSucess) {
 			setUsers(users => users.filter(user => user._id !== id))
 			toast.success('Successfully')
 			return
@@ -65,13 +60,8 @@ function Dashboard() {
 	}
 
 	const handleShowUser = (id: string) => {
-		const foundUser = users.find(user => user._id === id)
-
-		if (foundUser) {
-			setSelectedUser(foundUser)
-			return
-		}
-		setSelectedUser(null)
+		const foundUser = users.find(user => user._id === id) || null;
+		setSelectedUser(foundUser)
 	}
 
 	return (
@@ -88,9 +78,9 @@ function Dashboard() {
 							</div>
 							<div className="lg:col-span-2">
 								<FormUser
-									onAddUser={handleAddUser}
-									onUpdateUser={handleUpdateUser}
-									selectedUser={selectedUser ? selectedUser : null}
+									handleAddUser={handleAddUser}
+									handleUpdateUser={handleUpdateUser}
+									selectedUser={selectedUser}
 								/>
 							</div>
 						</div>

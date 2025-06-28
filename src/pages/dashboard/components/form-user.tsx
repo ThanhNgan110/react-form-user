@@ -9,12 +9,12 @@ import Button from '../../../components/ui/button/simple-buton'
 import type { IAccount } from '../../../types'
 
 interface FormUserProps {
-	onAddUser: (user: Omit<IAccount, 'id'>) => void
-	selectedUser: IAccount | null
-	onUpdateUser: (user: Omit<IAccount, 'id'>) => void
+	handleAddUser: (user: Omit<IAccount, 'id'>) => void
+	selectedUser?: IAccount | null
+	handleUpdateUser: (user: Omit<IAccount, 'id'>) => void
 }
 
-function FormUser({ onAddUser, onUpdateUser, selectedUser }: FormUserProps) {
+function FormUser({ handleAddUser, handleUpdateUser, selectedUser = null }: FormUserProps) {
 	const {
 		control,
 		handleSubmit,
@@ -36,29 +36,28 @@ function FormUser({ onAddUser, onUpdateUser, selectedUser }: FormUserProps) {
 
 	const onSubmit: SubmitHandler<Omit<IAccount, 'id'>> = user => {
 		if (selectedUser) {
-			onUpdateUser({ ...selectedUser, ...user })
+			handleUpdateUser({ ...selectedUser, ...user })
 		} else {
-			onAddUser(user)
+			handleAddUser(user)
 		}
+    reset({
+      first_name: '',
+      last_name: '',
+      email: '',
+      address: '',
+      city: '',
+      country: '',
+      state: '',
+      role: '',
+      password: '123456',
+    })
 	}
 
 	useEffect(() => {
 		if (selectedUser) {
 			reset(selectedUser)
-		} else {
-			reset({
-				first_name: '',
-				last_name: '',
-				email: '',
-				address: '',
-				city: '',
-				country: '',
-				state: '',
-				role: '',
-				password: '123456',
-			})
 		}
-	}, [reset, selectedUser])
+	}, [selectedUser])
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
